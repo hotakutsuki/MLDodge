@@ -1,0 +1,34 @@
+﻿
+#pragma kernel CSMain
+
+struct MatrixCalculation
+{
+	float[, ] a;
+	float[, ] b;
+	float[, ] ans;
+}
+
+RWStructuredBuffer<MatrixCalculation> calculation;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+	MatrixCalculation obj = calculation[id.x];
+
+	/*if (a.GetLength(1) != b.GetLength(0))
+	{
+		Debug.Log(a.GetLength(0) + "," + a.GetLength(1) + " X " + b.GetLength(0) + "," + b.GetLength(1));
+		throw new System.Exception("Wrong arguments");
+	}*/
+
+
+
+	//double[, ] result = new double[a.GetLength(0), b.GetLength(1)];
+
+	for (int j = 0; j < b.GetLength(1); j++)
+		for (int k = 0; k < a.GetLength(0); k++)
+			for (int i = 0; i < a.GetLength(1); i++)
+				obj.ans[k, j] = obj.ans[k, j] + a[k, i] * b[i, j];
+
+	numbers[id.x] = obj;
+}
