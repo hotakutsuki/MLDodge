@@ -1,87 +1,89 @@
-<!DOCTYPE html>
-<html lang="en-us">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | ML2021</title>
-    <link rel="shortcut icon" href="TemplateData/favicon.ico">
-    <link rel="stylesheet" href="TemplateData/style.css">
-  </head>
-  <body>
-    <div id="unity-container" class="unity-desktop">
-      <canvas id="unity-canvas" width=960 height=600></canvas>
-      <div id="unity-loading-bar">
-        <div id="unity-logo"></div>
-        <div id="unity-progress-bar-empty">
-          <div id="unity-progress-bar-full"></div>
-        </div>
-      </div>
-      <div id="unity-mobile-warning">
-        WebGL builds are not supported on mobile devices.
-      </div>
-      <div id="unity-footer">
-        <div id="unity-webgl-logo"></div>
-        <div id="unity-fullscreen-button"></div>
-        <div id="unity-build-title">ML2021</div>
-      </div>
-    </div>
-    <script>
-      var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/html5.loader.js";
-      var config = {
-        dataUrl: buildUrl + "/html5.data.gz",
-        frameworkUrl: buildUrl + "/html5.framework.js.gz",
-        codeUrl: buildUrl + "/html5.wasm.gz",
-        streamingAssetsUrl: "StreamingAssets",
-        companyName: "DefaultCompany",
-        productName: "ML2021",
-        productVersion: "0.1",
-      };
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MLDodge — una IA que aprende a esquivar</title>
+<style>
+  :root {
+    --ink: #0a0e14; --panel: #111823; --panel-2: #0e141d;
+    --line: rgba(126,148,178,.14); --line-2: rgba(126,148,178,.28);
+    --txt: #b6c2d2; --dim: #6e7b8e; --faint: #4b5567;
+    --cyan: #38c8ff; --green: #46e08a; --amber: #ffcf5a; --violet: #b58cff;
+    --mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; color: var(--txt); font-family: var(--sans); line-height: 1.6;
+    background: radial-gradient(120% 80% at 50% -10%, #121a26 0%, var(--ink) 55%) fixed;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 56px 20px 80px; }
+  .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--cyan); margin: 0 0 14px; }
+  h1 { font-family: var(--mono); font-size: clamp(30px, 6vw, 52px); font-weight: 600; margin: 0; color: #eaf1f8; letter-spacing: -.015em; text-wrap: balance; }
+  h1 b { color: var(--cyan); font-weight: 600; }
+  .lede { font-size: clamp(16px, 2.4vw, 19px); color: #cdd8e6; max-width: 60ch; margin: 18px 0 0; }
+  .meta { font-family: var(--mono); font-size: 12.5px; color: var(--dim); margin-top: 16px; }
 
-      var container = document.querySelector("#unity-container");
-      var canvas = document.querySelector("#unity-canvas");
-      var loadingBar = document.querySelector("#unity-loading-bar");
-      var progressBarFull = document.querySelector("#unity-progress-bar-full");
-      var fullscreenButton = document.querySelector("#unity-fullscreen-button");
-      var mobileWarning = document.querySelector("#unity-mobile-warning");
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 44px 0 40px; }
+  @media (max-width: 680px) { .cards { grid-template-columns: 1fr; } }
+  .card {
+    display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: inherit;
+    background: linear-gradient(180deg, var(--panel), var(--panel-2));
+    border: 1px solid var(--line); border-radius: 12px; padding: 22px; position: relative;
+    transition: border-color .18s, transform .18s;
+  }
+  .card:hover { border-color: var(--line-2); transform: translateY(-2px); }
+  .card:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+  .card .yr { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; color: var(--faint); }
+  .card h2 { font-size: 21px; margin: 0; color: #eaf1f8; }
+  .card .tech { font-family: var(--mono); font-size: 11.5px; color: var(--dim); letter-spacing: .04em; }
+  .card p { margin: 0; font-size: 14px; color: var(--dim); }
+  .card .go { margin-top: auto; font-family: var(--mono); font-size: 13px; color: var(--cyan); letter-spacing: .04em; }
+  .card.py .go { color: var(--green); }
+  .card .badge { position: absolute; top: 18px; right: 18px; font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; padding: 3px 8px; border-radius: 20px; }
+  .card.unity .badge { color: var(--violet); border: 1px solid rgba(181,140,255,.3); }
+  .card.py .badge { color: var(--green); border: 1px solid rgba(70,224,138,.3); }
 
-      // By default Unity keeps WebGL canvas render target size matched with
-      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
-      // Set this to false if you want to decouple this synchronization from
-      // happening inside the engine, and you would instead like to size up
-      // the canvas DOM size and WebGL render target sizes yourself.
-      // config.matchWebGLToCanvasSize = false;
+  .note { border-top: 1px solid var(--line); padding-top: 22px; color: var(--dim); font-size: 14px; max-width: 68ch; }
+  .note b { color: var(--txt); font-weight: 600; }
+  .links { font-family: var(--mono); font-size: 13px; margin-top: 26px; display: flex; gap: 22px; flex-wrap: wrap; }
+  a { color: var(--cyan); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Proyecto de aprendizaje automático · desde cero</p>
+  <h1>ML<b>Dodge</b></h1>
+  <p class="lede">Una IA que nadie programó para jugar: aprende sola a esquivar proyectiles. Empecé este proyecto en Unity en 2021 y lo reescribí entero en Python en 2026 — esta vez sin motores ni frameworks, solo NumPy y un algoritmo genético.</p>
+  <p class="meta">Dos implementaciones · dos demos jugables en el navegador ↓</p>
 
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        container.className = "unity-mobile";
-        // Avoid draining fillrate performance on mobile devices,
-        // and default/override low DPI mode on mobile browsers.
-        config.devicePixelRatio = 1;
-        mobileWarning.style.display = "block";
-        setTimeout(() => {
-          mobileWarning.style.display = "none";
-        }, 5000);
-      } else {
-        canvas.style.width = "960px";
-        canvas.style.height = "600px";
-      }
-      loadingBar.style.display = "block";
+  <div class="cards">
+    <a class="card unity" href="unity/">
+      <span class="badge">WebGL</span>
+      <span class="yr">2021</span>
+      <h2>Versión Unity</h2>
+      <span class="tech">C# · Unity · red neuronal + genético</span>
+      <p>La primera versión. Motor Unity, agentes que evolucionan por generaciones esquivando en tiempo real.</p>
+      <span class="go">▶ Jugar la demo →</span>
+    </a>
+    <a class="card py" href="neural-dodger/">
+      <span class="badge">Nuevo</span>
+      <span class="yr">2026</span>
+      <h2>Versión Python</h2>
+      <span class="tech">NumPy puro · genético + visión egocéntrica</span>
+      <p>Reescritura desde cero: forward y evolución a mano, sin ML frameworks. Ver a la IA, jugar, competir contra ella, y leer el proceso.</p>
+      <span class="go">▶ Jugar la demo →</span>
+    </a>
+  </div>
 
-      var script = document.createElement("script");
-      script.src = loaderUrl;
-      script.onload = () => {
-        createUnityInstance(canvas, config, (progress) => {
-          progressBarFull.style.width = 100 * progress + "%";
-        }).then((unityInstance) => {
-          loadingBar.style.display = "none";
-          fullscreenButton.onclick = () => {
-            unityInstance.SetFullscreen(1);
-          };
-        }).catch((message) => {
-          alert(message);
-        });
-      };
-      document.body.appendChild(script);
-    </script>
-  </body>
+  <p class="note"><b>¿Qué la hace interesante?</b> La red solo “ve” un mapa de peligro 7×7 centrado en ella y decide 128 veces por segundo. No hay reglas escritas a mano: la estrategia emergió de cientos de generaciones de selección, cruza y mutación. La versión Python documenta cada experimento — incluido uno con aprendizaje por refuerzo (RL) que <em>perdió</em> contra la evolución, y por qué.</p>
+
+  <div class="links">
+    <a href="https://github.com/hotakutsuki/MLDodge">Código en GitHub →</a>
+    <a href="https://github.com/hotakutsuki/MLDodge/tree/main/python">El proyecto Python →</a>
+  </div>
+</div>
+</body>
 </html>

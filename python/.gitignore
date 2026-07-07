@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+# Salida de runtime del entrenamiento (los campeones van en saved_brains/)
+checkpoints/
