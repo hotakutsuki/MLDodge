@@ -1,0 +1,18 @@
+{
+  "generation": 1014,
+  "best_fitness_ever": 61.59918996360512,
+  "curriculum_progress": 1.0,
+  "layer_sizes": [
+    104,
+    48,
+    32,
+    16,
+    5
+  ],
+  "game": {
+    "arena_w": 420.0,
+    "arena_h": 420.0,
+    "speed": 120.0,
+    "spawn_interval": 0.6
+  }
+}
